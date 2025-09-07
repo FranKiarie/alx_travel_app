@@ -9,7 +9,8 @@ A Django-based travel listing platform with REST API, Swagger documentation, and
 ```bash
 git clone https://github.com/FranKiarie/alx_travel_app.git
 cd alx_travel_app
-docker-compose up --build
+cp .env.docker .env        # optional: devs often do this to keep one env
+docker compose up --build
 ```
 
 Visit http://localhost:8000/admin/ to create a superuser.
@@ -189,30 +190,31 @@ pip install mysqlclient-2.1.1-cp39-cp39-win_amd64.whl
 
 ```bash
 # Build and start all services
-docker-compose up --build
+docker compose up --build
 
 # Start in background
-docker-compose up -d
+docker compose up -d
 
 # View logs
-docker-compose logs -f
+docker compose logs -f
 
 # Stop services
-docker-compose down
+docker compose down
 
 # Rebuild specific service
-docker-compose build web
+docker compose build web
 
 # Run Django commands
-docker-compose exec web python manage.py migrate
-docker-compose exec web python manage.py createsuperuser
-docker-compose exec web python manage.py collectstatic
+docker compose exec web python manage.py check
+docker compose exec web python manage.py createsuperuser
+docker compose exec web python manage.py makemigrations
+docker compose exec web python manage.py migrate
 
 # Access database
-docker-compose exec db mysql -u alx_user -p alx_travel_db
+docker compose exec db mysql -u alx_user -p alx_travel_db
 
 # Clean up (remove volumes)
-docker-compose down -v
+docker compose down -v
 ```
 
 ## Development

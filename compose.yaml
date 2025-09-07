@@ -1,0 +1,73 @@
+name: alx_travel_app
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # If your file is 'requirement.txt', change this to match
+        REQUIREMENTS_FILE: requirements.txt
+    image: alx_travel_app:dev
+    container_name: alx_travel_web
+    env_file:
+      - .env.docker
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app:cached
+    depends_on:
+      db:
+        condition: service_healthy
+    # For Django autoreload to see code changes inside container
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
+  db:
+    image: mysql:8.0
+    container_name: alx_travel_db
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-alx_travel_db}
+      MYSQL_USER: ${DB_USER:-alx_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-strongpass}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpass}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p${MYSQL_ROOT_PASSWORD:-rootpass} --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # OPTIONAL: Celery worker (uncomment when you add tasks)
+  # worker:
+  #   image: alx_travel_app:dev
+  #   container_name: alx_travel_worker
+  #   env_file:
+  #     - .env.docker
+  #   depends_on:
+  #     - db
+  #     - rabbit
+  #   command: ["celery", "-A", "alx_travel_app", "worker", "--loglevel=INFO"]
+
+  # OPTIONAL: Celery beat (scheduler)
+  # beat:
+  #   image: alx_travel_app:dev
+  #   container_name: alx_travel_beat
+  #   env_file:
+  #     - .env.docker
+  #   depends_on:
+  #     - db
+  #     - rabbit
+  #   command: ["celery", "-A", "alx_travel_app", "beat", "--loglevel=INFO"]
+
+  # OPTIONAL: RabbitMQ for Celery broker
+  # rabbit:
+  #   image: rabbitmq:3-management
+  #   container_name: alx_travel_rabbit
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672" # mgmt UI at http://localhost:15672 (guest/guest)
+
+volumes:
+  db_data:
