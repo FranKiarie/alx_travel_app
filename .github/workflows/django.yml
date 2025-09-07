@@ -1,0 +1,44 @@
+name: Django CI
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install deps
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install flake8 black isort || true
+      - name: Django checks & migrations
+        env:
+          DEBUG: "False"
+          SECRET_KEY: ci-secret
+          ALLOWED_HOSTS: 127.0.0.1,localhost
+        run: |
+          source .venv/bin/activate
+          python manage.py check
+          python manage.py migrate --noinput
+      - name: Lint
+        run: |
+          source .venv/bin/activate
+          flake8 . || true
+          black --check . || true
+          isort --check-only . || true
+      - name: Tests
+        run: |
+          source .venv/bin/activate
+          if command -v pytest >/dev/null 2>&1; then pytest -q; else python manage.py test -v 2; fi

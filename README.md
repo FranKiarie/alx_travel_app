@@ -1,319 +1,188 @@
 # ALX Travel App
 
-A Django-based travel listing platform with REST API, Swagger documentation, and MySQL database integration. This project serves as the foundation for a travel listing platform with industry-standard best practices for Django development.
+A Django-based travel listing platform with REST API, Swagger documentation, and flexible database configuration.
 
-## 🚀 Features
+## Quickstart (Dev)
 
-- **Django REST Framework** - Robust API development framework
-- **Swagger/OpenAPI Documentation** - Interactive API documentation at `/swagger/`
-- **CORS Headers** - Cross-origin resource sharing for frontend integration
-- **MySQL Database** - Production-ready database with PyMySQL integration
-- **Celery Integration** - Background task processing with RabbitMQ
-- **Environment Management** - Secure configuration with django-environ
-- **Health Check Endpoint** - API status monitoring at `/api/health/`
-- **Modular Architecture** - Scalable project structure with separate apps
-
-## 📋 Prerequisites
-
-- **Python 3.8+** - Required for Django 5.2.6
-- **MySQL 8.0+** - Database server
-- **RabbitMQ** - Message broker for Celery (optional for basic setup)
-- **Git** - Version control
-
-## 🛠️ Installation
-
-1. **Clone the repository:**
 ```bash
 git clone https://github.com/FranKiarie/alx_travel_app.git
 cd alx_travel_app
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env
+python manage.py migrate
+python manage.py runserver
 ```
 
-2. **Install dependencies:**
-```bash
-pip3 install -r requirements.txt
-```
+Visit http://localhost:8000/admin/ to create a superuser.
 
-3. **Set up environment variables:**
-```bash
-cp env.example .env
-# Edit .env with your configuration
-```
+## Database Options
 
-**Required Environment Variables:**
-- `SECRET_KEY`: Generate with: `python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"`
-- `DEBUG`: Set to `True` for development, `False` for production
-- `ALLOWED_HOSTS`: Comma-separated list (e.g., `localhost,127.0.0.1,yourdomain.com`)
+### SQLite (Default)
+No setup required. Works out of the box with `.env.example`.
 
-**Database Options:**
-- **Option A - SQLite (Quick Start)**: Leave `DB_NAME` empty in `.env` to use SQLite
-- **Option B - MySQL (Production)**: Set up MySQL and configure database credentials
-
-4. **Database Setup:**
-
-**For MySQL (Production):**
+### MySQL (Production-like)
+1. Install MySQL and create database:
 ```sql
-CREATE DATABASE alx_travel_db;
-GRANT ALL PRIVILEGES ON alx_travel_db.* TO 'your_username'@'localhost';
+CREATE DATABASE alx_travel;
+CREATE USER 'alx_user'@'localhost' IDENTIFIED BY 'strongpass';
+GRANT ALL PRIVILEGES ON alx_travel.* TO 'alx_user'@'localhost';
 FLUSH PRIVILEGES;
 ```
 
-**For SQLite (Development):**
-- No setup required - database will be created automatically
-
-5. **Run migrations:**
-```bash
-python3 manage.py makemigrations
-python3 manage.py migrate
-```
-
-6. **Create superuser (optional):**
-```bash
-python3 manage.py createsuperuser
-```
-
-7. **Start the development server:**
-```bash
-python3 manage.py runserver
-```
-
-The server will start at `http://localhost:8000/`
-
-## 📚 API Documentation
-
-Once the server is running, you can access:
-
-| Endpoint | Description | URL |
-|----------|-------------|-----|
-| **Swagger UI** | Interactive API documentation | http://localhost:8000/swagger/ |
-| **ReDoc** | Alternative API documentation | http://localhost:8000/redoc/ |
-| **Admin Panel** | Django admin interface | http://localhost:8000/admin/ |
-| **Health Check** | API status endpoint | http://localhost:8000/api/health/ |
-| **API Root** | Main API endpoint | http://localhost:8000/api/ |
-
-## 📁 Project Structure
-
-```
-alx_travel_app/
-├── alx_travel_app/          # Main project directory
-│   ├── __init__.py         # Python package marker (empty)
-│   ├── settings.py         # Django settings with environment variables
-│   ├── urls.py            # Main URL configuration with Swagger
-│   ├── wsgi.py            # WSGI configuration
-│   └── asgi.py            # ASGI configuration
-├── listings/              # Listings Django app
-│   ├── __init__.py        # Python package marker (empty)
-│   ├── admin.py           # Admin configuration
-│   ├── apps.py            # App configuration
-│   ├── models.py          # Database models
-│   ├── views.py           # API views with health check
-│   ├── urls.py            # App URL configuration
-│   ├── tests.py           # Test cases
-│   └── migrations/        # Database migrations
-│       └── __init__.py    # Migrations package marker
-├── requirements.txt       # Python dependencies (30 packages)
-├── .env                   # Environment variables (local, gitignored)
-├── env.example           # Environment variables template
-├── .gitignore            # Git ignore rules
-├── README.md             # Project documentation
-└── manage.py             # Django management script
-```
-
-**Note**: Static files, templates, and media directories will be created as needed during development.
-
-## ⚙️ Environment Variables
-
-The following environment variables are required in your `.env` file:
-
+2. Update `.env`:
 ```env
-# Django Configuration
-SECRET_KEY=your-secret-key-here
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
-
-# Database Configuration
-DB_NAME=alx_travel_db
-DB_USER=root
-DB_PASSWORD=your-password
-DB_HOST=localhost
+DB_ENGINE=mysql
+DB_NAME=alx_travel
+DB_USER=alx_user
+DB_PASSWORD=strongpass
+DB_HOST=127.0.0.1
 DB_PORT=3306
-
-# Celery Configuration (Optional)
-CELERY_BROKER_URL=amqp://localhost:5672
-CELERY_RESULT_BACKEND=rpc://
 ```
 
-> **Note**: Copy `env.example` to `.env` and update the values according to your setup.
-
-## 🛠️ Development
-
-### Quick Start Commands
+3. Install MySQL driver:
 ```bash
-# Check project health
-python3 manage.py check
+# macOS
+brew install mysql-client
+export PATH="/opt/homebrew/bin:$PATH"
 
-# Run tests
-python3 manage.py test
-
-# Start development server
-python3 manage.py runserver
-
-# Access API documentation
-open http://localhost:8000/swagger/
+# Ubuntu/Debian
+sudo apt-get install python3-dev default-libmysqlclient-dev build-essential
+pip install mysqlclient
 ```
 
-### Database Operations
-```bash
-# Create new migrations
-python3 manage.py makemigrations
+## REST & CORS
 
-# Apply migrations
-python3 manage.py migrate
-
-# Show migration status
-python3 manage.py showmigrations
-
-# Create superuser
-python3 manage.py createsuperuser
-
-# Reset database (SQLite)
-rm db.sqlite3 && python3 manage.py migrate
-
-# Load sample data (if available)
-python3 manage.py loaddata fixtures/sample_data.json
+Set `CORS_ALLOWED_ORIGINS` in `.env` for frontend integration:
+```env
+CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8080
 ```
 
-### Code Quality & Testing
-```bash
-# Check for Django issues
-python3 manage.py check
+## Static Files (Production)
 
-# Run linting (if configured)
+```bash
+python manage.py collectstatic
+```
+
+## Optional Swagger
+
+1. Install drf-yasg:
+```bash
+pip install drf-yasg
+```
+
+2. Add to `INSTALLED_APPS` in `settings.py`:
+```python
+INSTALLED_APPS = [
+    # ... other apps
+    "drf_yasg",
+]
+```
+
+3. Add to `urls.py`:
+```python
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+schema_view = get_schema_view(
+    openapi.Info(title="ALX Travel API", default_version="v1"),
+    public=True,
+)
+
+urlpatterns = [
+    # ... other patterns
+    path("swagger/", schema_view.with_ui("swagger")),
+    path("redoc/", schema_view.with_ui("redoc")),
+]
+```
+
+Endpoints: `/swagger/`, `/redoc/`
+
+## Runbook
+
+### Common Commands
+```bash
+# Lint
 flake8 .
+black .
+isort .
+
+# Django checks
+python manage.py check
+python manage.py check --deploy
+
+# Migrations
+python manage.py makemigrations
+python manage.py migrate
+python manage.py showmigrations
+
+# User management
+python manage.py createsuperuser
+python manage.py changepassword <username>
+
+# Tests
+python manage.py test
+pytest  # if using pytest
+
+# Static files
+python manage.py collectstatic
+python manage.py findstatic admin/css/base.css
+```
+
+## Troubleshooting
+
+### DisallowedHost Error
+Add your domain to `ALLOWED_HOSTS` in `.env`:
+```env
+ALLOWED_HOSTS=127.0.0.1,localhost,yourdomain.com
+```
+
+### CORS Blocked
+Check `CORS_ALLOWED_ORIGINS` in `.env`:
+```env
+CORS_ALLOWED_ORIGINS=http://localhost:3000
+```
+
+### mysqlclient Install Issues
+```bash
+# macOS
+brew install mysql-client
+export PATH="/opt/homebrew/bin:$PATH"
+pip install mysqlclient
+
+# Ubuntu/Debian
+sudo apt-get install python3-dev default-libmysqlclient-dev build-essential
+pip install mysqlclient
+
+# Windows
+# Download wheel from https://www.lfd.uci.edu/~gohlke/pythonlibs/#mysqlclient
+pip install mysqlclient-2.1.1-cp39-cp39-win_amd64.whl
+```
+
+### Environment Variables Not Loading
+1. Ensure `.env` exists in project root
+2. Check file permissions: `ls -la .env`
+3. Verify django-environ is installed: `pip list | grep django-environ`
+
+### Swagger 404
+1. Ensure `drf_yasg` is in `INSTALLED_APPS`
+2. Check URL patterns in `urls.py`
+3. Verify app is in `INSTALLED_APPS`
+
+## Development
+
+```bash
+# Run with debug
+DEBUG=True python manage.py runserver
 
 # Run tests with coverage
-python3 manage.py test --verbosity=2
-
-# Check for security issues
-python3 manage.py check --deploy
+pip install coverage
+coverage run --source='.' manage.py test
+coverage report
+coverage html
 ```
 
-### Static Files & Media
-```bash
-# Collect static files
-python3 manage.py collectstatic
+## License
 
-# Serve static files in development
-python3 manage.py runserver --insecure
-```
-
-### Celery (Background Tasks)
-```bash
-# Start Celery worker
-celery -A alx_travel_app worker --loglevel=info
-
-# Start Celery beat (scheduler)
-celery -A alx_travel_app beat --loglevel=info
-
-# Monitor Celery tasks
-celery -A alx_travel_app flower
-```
-
-### Environment Management
-```bash
-# Generate new secret key
-python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-
-# Check environment variables
-python3 manage.py shell -c "from django.conf import settings; print('DEBUG:', settings.DEBUG)"
-
-# Validate .env file
-python3 -c "import os; from dotenv import load_dotenv; load_dotenv(); print('SECRET_KEY set:', bool(os.getenv('SECRET_KEY')))"
-```
-
-## 🚀 Quick Start (5 minutes)
-
-**For immediate testing without MySQL setup:**
-
-1. **Clone and install:**
-```bash
-git clone https://github.com/FranKiarie/alx_travel_app.git
-cd alx_travel_app
-pip3 install -r requirements.txt
-```
-
-2. **Use SQLite (no database setup needed):**
-```bash
-cp env.example .env
-# Edit .env and leave DB_NAME empty to use SQLite
-```
-
-3. **Run the project:**
-```bash
-python3 manage.py migrate
-python3 manage.py runserver
-```
-
-4. **Access the API:**
-   - **Health Check**: http://localhost:8000/api/health/
-   - **Swagger Docs**: http://localhost:8000/swagger/
-   - **Admin Panel**: http://localhost:8000/admin/
-   - **ReDoc**: http://localhost:8000/redoc/
-
-**That's it!** Your Django API is running with SQLite database.
-
-## 📦 Dependencies & Third-Party Apps
-
-This project uses 30 Python packages including:
-
-### Core Framework
-- **Django 5.2.6** - Web framework
-- **Django REST Framework 3.16.1** - API framework
-
-### API Documentation
-- **drf-yasg 1.21.10** - Swagger/OpenAPI documentation
-- **PyYAML 6.0.2** - YAML support for API docs
-
-### Database & Authentication
-- **PyMySQL 1.1.2** - MySQL database adapter
-- **cryptography 45.0.7** - MySQL authentication support
-
-### CORS & Security
-- **django-cors-headers 4.7.0** - Cross-Origin Resource Sharing
-- **django-environ 0.12.0** - Environment variable management
-
-### Background Tasks
-- **Celery 5.5.3** - Background task processing
-- **kombu 5.5.4** - Message transport
-- **billiard 4.2.1** - Multiprocessing library
-
-### Configuration
-- **CORS_ALLOWED_ORIGINS**: Configured for localhost:3000, localhost:8000
-- **REST_FRAMEWORK**: Pagination, JSON rendering, permissions
-- **SWAGGER_SETTINGS**: Interactive API documentation
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Add tests if applicable
-5. Commit your changes (`git commit -m 'Add amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the BSD License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-If you encounter any issues:
-
-1. Check the [Issues](https://github.com/FranKiarie/alx_travel_app/issues) page
-2. Create a new issue with detailed information
-3. Ensure all prerequisites are installed
-4. Verify your environment variables are correct
-
----
-
-**Built with ❤️ for ALX Software Engineering Program**
+BSD License
