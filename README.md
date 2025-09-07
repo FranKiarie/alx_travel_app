@@ -4,6 +4,18 @@ A Django-based travel listing platform with REST API, Swagger documentation, and
 
 ## Quickstart (Dev)
 
+### Option 1: Docker (Recommended)
+
+```bash
+git clone https://github.com/FranKiarie/alx_travel_app.git
+cd alx_travel_app
+docker-compose up --build
+```
+
+Visit http://localhost:8000/admin/ to create a superuser.
+
+### Option 2: Local Development
+
 ```bash
 git clone https://github.com/FranKiarie/alx_travel_app.git
 cd alx_travel_app
@@ -19,10 +31,13 @@ Visit http://localhost:8000/admin/ to create a superuser.
 
 ## Database Options
 
-### SQLite (Default)
+### Docker (Recommended)
+MySQL database is automatically set up with Docker Compose. No additional configuration needed.
+
+### SQLite (Local Development)
 No setup required. Works out of the box with `.env.example`.
 
-### MySQL (Production-like)
+### MySQL (Local Production-like)
 1. Install MySQL and create database:
 ```sql
 CREATE DATABASE alx_travel;
@@ -169,6 +184,36 @@ pip install mysqlclient-2.1.1-cp39-cp39-win_amd64.whl
 1. Ensure `drf_yasg` is in `INSTALLED_APPS`
 2. Check URL patterns in `urls.py`
 3. Verify app is in `INSTALLED_APPS`
+
+## Docker Commands
+
+```bash
+# Build and start all services
+docker-compose up --build
+
+# Start in background
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+
+# Rebuild specific service
+docker-compose build web
+
+# Run Django commands
+docker-compose exec web python manage.py migrate
+docker-compose exec web python manage.py createsuperuser
+docker-compose exec web python manage.py collectstatic
+
+# Access database
+docker-compose exec db mysql -u alx_user -p alx_travel_db
+
+# Clean up (remove volumes)
+docker-compose down -v
+```
 
 ## Development
 

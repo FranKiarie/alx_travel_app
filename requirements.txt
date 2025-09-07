@@ -1,7 +1,11 @@
-django-environ
-django-cors-headers
+Django
 djangorestframework
+django-cors-headers
+django-environ
 # optional:
 drf-yasg
-# if using MySQL:
+# for MySQL:
 mysqlclient
+# for Redis/Celery:
+redis
+celery
